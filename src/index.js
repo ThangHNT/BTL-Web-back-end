@@ -13,7 +13,7 @@ app.use(express.json({ limit: '100mb' }));
 
 async function connect() {
     try {
-        await mongoose.connect('mongodb://localhost:27017/chat');
+        await mongoose.connect('mongodb://localhost:27017/book-library');
         console.log('Connect database successfully');
     } catch (err) {
         console.log('connect database failed');

@@ -2,12 +2,9 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 
 class UserController {
-    home(req, res, next) {
-        res.send('server running');
-    }
-
     async register(req, res, next) {
-        const { account, password, email } = req.body;
+        const { account, password, email, phoneNumber, avatar } = req.body;
+        console.log(req.body);
         let checkAccount, checkEmail;
         checkAccount = await User.findOne({ account });
         if (checkAccount) return res.json({ status: false, msg: 'Tai khoan da ton tai' });
@@ -18,16 +15,30 @@ class UserController {
         user.account = account;
         user.email = email;
         user.password = hashPw;
+        user.phoneNumber = phoneNumber;
+        avatar
+            ? (user.avatar = avatar)
+            : (user.avatar =
+                  'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png');
         user.save();
         const newUser = {
             account,
-            userid: user._id,
+            userId: user._id,
+            avatar: user.avatar,
         };
         return res.json({ status: true, newUser });
     }
 
     async login(req, res) {
         const { account, password } = req.body;
+        let checkAccount = await User.findOne({ account });
+        let checkPassword = bcrypt.compare(password, checkAccount.password);
+        if (checkPassword) {
+            let user = { userId: checkAccount._id, avatar: checkAccount.avatar, account: checkAccount.account };
+            return res.json({ status: true, user });
+        } else {
+            return res.json({ status: false, msg: 'Tài khoản hoặc mật khẩu không đúng' });
+        }
     }
 }
 
