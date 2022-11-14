@@ -8,6 +8,7 @@ const Book = Schema({
     releaseDate: { type: String, required: true },
     coverImage: { type: String, required: true },
     category: { type: String, required: true, maxLength: 20 },
+    numberOfPage: { type: String, required: true },
 });
 
 module.exports = mongoose.model('Book', Book);

@@ -20,7 +20,7 @@ class UserController {
             ? (user.avatar = avatar)
             : (user.avatar =
                   'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png');
-        user.save();
+        // user.save();
         const newUser = {
             account,
             userId: user._id,
@@ -39,6 +39,17 @@ class UserController {
         } else {
             return res.json({ status: false, msg: 'Tài khoản hoặc mật khẩu không đúng' });
         }
+    }
+
+    async checkAdmin(req, res) {
+        const { userId } = req.body;
+        let checkAdminUser = await User.findOne({ _id: userId });
+        if (checkAdminUser.admin) {
+            return res.json({ status: true });
+        } else {
+            return res.json({ status: false });
+        }
+        // res.send('oke');
     }
 }
 
