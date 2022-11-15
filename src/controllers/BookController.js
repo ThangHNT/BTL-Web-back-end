@@ -14,6 +14,17 @@ class BookController {
         book.save();
         return res.json({ status: true });
     }
+
+    getAllBook(req, res) {
+        Book.find({}, (err, books) => {
+            return res.json({ books });
+        });
+    }
+
+    bookDetail(req, res) {
+        console.log('BookDetail');
+        res.send('book detail');
+    }
 }
 
 module.exports = new BookController();
