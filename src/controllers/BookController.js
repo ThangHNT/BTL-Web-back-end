@@ -21,9 +21,14 @@ class BookController {
         });
     }
 
-    bookDetail(req, res) {
-        console.log('BookDetail');
-        res.send('book detail');
+    async bookDetail(req, res) {
+        // console.log(req.query);
+        const book = await Book.findOne({ _id: req.query.id });
+        if (book) {
+            return res.json({ status: true, book });
+        } else {
+            return res.json({ status: false });
+        }
     }
 }
 
