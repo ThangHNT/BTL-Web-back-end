@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 class UserController {
     async register(req, res, next) {
         const { account, password, email, phoneNumber, avatar } = req.body;
-        console.log(req.body);
+        // console.log(req.body);
         let checkAccount, checkEmail;
         checkAccount = await User.findOne({ account });
         if (checkAccount) return res.json({ status: false, msg: 'Tai khoan da ton tai' });
@@ -20,7 +20,7 @@ class UserController {
             ? (user.avatar = avatar)
             : (user.avatar =
                   'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png');
-        // user.save();
+        user.save();
         const newUser = {
             account,
             userId: user._id,
@@ -32,10 +32,14 @@ class UserController {
     async login(req, res) {
         const { account, password } = req.body;
         let checkAccount = await User.findOne({ account });
-        let checkPassword = bcrypt.compare(password, checkAccount.password);
-        if (checkPassword) {
-            let user = { userId: checkAccount._id, avatar: checkAccount.avatar, account: checkAccount.account };
-            return res.json({ status: true, user });
+        if (checkAccount) {
+            let checkPassword = bcrypt.compare(password, checkAccount.password);
+            if (checkPassword) {
+                let user = { userId: checkAccount._id, avatar: checkAccount.avatar, account: checkAccount.account };
+                return res.json({ status: true, user });
+            } else {
+                return res.json({ status: false, msg: 'Tài khoản hoặc mật khẩu không đúng' });
+            }
         } else {
             return res.json({ status: false, msg: 'Tài khoản hoặc mật khẩu không đúng' });
         }
