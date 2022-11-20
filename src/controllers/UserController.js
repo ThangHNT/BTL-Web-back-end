@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const Order = require('../models/order');
 const Book = require('../models/book');
 const Cart = require('../models/cart');
+const book = require('../models/book');
 
 class UserController {
     async register(req, res, next) {
@@ -88,9 +89,44 @@ class UserController {
         return res.json({ status: true });
     }
 
-    getCart(req, res) {
-        console.log(req.params);
-        res.send('oke');
+    async getCart(req, res) {
+        let userId = req.params.id;
+        const cart = await Cart.findOne({ user: userId });
+        // console.log(cart);
+        let books = cart.books.map(async (item) => {
+            let book = await Book.findOne({ _id: item });
+            let bookInfo = {
+                bookId: book._id,
+                author: book.author,
+                coverImage: book.coverImage,
+                price: book.price,
+                title: book.title,
+            };
+            let ordering = await Order.find({ book: item, customer: userId });
+            let purchaseHistory = [];
+            ordering.forEach((item) => {
+                let orderingDetail = {
+                    receiver: item.receiver,
+                    phoneNumber: item.phoneNumber,
+                    address: item.address,
+                    quantity: item.quantity,
+                    totalPrice: Number(item.quantity) * Number(book.price),
+                    date: item.date,
+                };
+                purchaseHistory.push(orderingDetail);
+            });
+            // console.log(purchaseHistory);
+            let data = { bookInfo, purchaseHistory };
+            return data;
+        });
+        books = Promise.all(books);
+        books.then((data) => {
+            // data: trả về mảng sách đã mua gồm bookInfo (thông tin về sách) và
+            // purchaseHistory : mảng danh order sách, nếu 1 cuốn đặt 1 lần sẽ có 1 ptu, 1 cuốn đặt nhiều lần sẽ
+            // có nhiều ptu.
+            // console.log(data[0].purchaseHistory);
+            res.json({ status: true, data });
+        });
     }
 }
 
