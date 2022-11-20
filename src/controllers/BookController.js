@@ -1,5 +1,6 @@
 const Book = require('../models/book');
 const Order = require('../models/order');
+const Cart = require('../models/cart');
 
 class BookController {
     addBook(req, res) {
@@ -33,24 +34,6 @@ class BookController {
         } else {
             return res.json({ status: false });
         }
-    }
-
-    async orderBook(req, res) {
-        const { book, customer, receiver, phoneNumber, email, quantity, address, date } = req.body;
-        const order = new Order();
-        order.book = book;
-        order.customer = customer;
-        order.receiver = receiver;
-        order.email = email;
-        order.address = address;
-        order.quantity = quantity;
-        order.phoneNumber = phoneNumber;
-        order.date = date;
-        order.save();
-        const thisBook = await Book.findOne({ _id: book });
-        thisBook.quantity = thisBook.quantity - quantity;
-        thisBook.save();
-        return res.json({ status: true });
     }
 }
 

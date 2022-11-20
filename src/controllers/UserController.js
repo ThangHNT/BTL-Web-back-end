@@ -1,5 +1,8 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
+const Order = require('../models/order');
+const Book = require('../models/book');
+const Cart = require('../models/cart');
 
 class UserController {
     async register(req, res, next) {
@@ -16,6 +19,9 @@ class UserController {
         user.email = email;
         user.password = hashPw;
         user.phoneNumber = phoneNumber;
+        const cart = new Cart();
+        cart.user = user._id;
+        cart.save();
         avatar
             ? (user.avatar = avatar)
             : (user.avatar =
@@ -53,7 +59,38 @@ class UserController {
         } else {
             return res.json({ status: false });
         }
-        // res.send('oke');
+    }
+
+    async orderBook(req, res) {
+        const { book, customer, receiver, phoneNumber, email, quantity, address, date } = req.body;
+        const order = new Order();
+        order.book = book;
+        order.customer = customer;
+        order.receiver = receiver;
+        order.email = email;
+        order.address = address;
+        order.quantity = quantity;
+        order.phoneNumber = phoneNumber;
+        order.date = date;
+        order.save();
+        const thisBook = await Book.findOne({ _id: book });
+        thisBook.quantity = thisBook.quantity - quantity;
+        if (thisBook.quantity < 0) thisBook.quantity = 0;
+        thisBook.save();
+
+        const cart = await Cart.findOne({ user: customer });
+        let existBook = cart.books.some((item) => item == book);
+        if (!existBook) {
+            cart.books.push(book);
+            cart.save();
+        }
+
+        return res.json({ status: true });
+    }
+
+    getCart(req, res) {
+        console.log(req.params);
+        res.send('oke');
     }
 }
 
