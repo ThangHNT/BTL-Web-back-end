@@ -106,6 +106,7 @@ class UserController {
             let purchaseHistory = [];
             ordering.forEach((item) => {
                 let orderingDetail = {
+                    orderId: item._id,
                     receiver: item.receiver,
                     phoneNumber: item.phoneNumber,
                     address: item.address,
@@ -126,6 +127,13 @@ class UserController {
             // có nhiều ptu.
             // console.log(data[0].purchaseHistory);
             res.json({ status: true, data });
+        });
+    }
+
+    async cancelOrder(req, res) {
+        // console.log(req.params);
+        Order.deleteOne({ _id: req.params.id }, (err, order) => {
+            res.json({ status: true });
         });
     }
 }
