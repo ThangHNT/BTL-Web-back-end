@@ -35,6 +35,28 @@ class BookController {
             return res.json({ status: false });
         }
     }
+
+    async editBook(req, res) {
+        // console.log(req.body);
+        const { title, author, releaseDate, description, category, coverImage, numberOfPage, price, quantity } =
+            req.body;
+        const book = await Book.findOne({ _id: req.params.id });
+        if (book) {
+            book.title = title;
+            book.price = price;
+            book.quantity = quantity;
+            book.author = author;
+            book.description = description;
+            book.category = category;
+            book.releaseDate = releaseDate;
+            book.coverImage = coverImage;
+            book.numberOfPage = numberOfPage;
+            book.save();
+            res.json({ status: true });
+        } else {
+            res.json({ status: false });
+        }
+    }
 }
 
 module.exports = new BookController();
