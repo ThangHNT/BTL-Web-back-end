@@ -57,6 +57,13 @@ class BookController {
             res.json({ status: false });
         }
     }
+
+    deleteBook(req, res) {
+        // console.log(req.params);
+        Book.deleteOne({ _id: req.params.id }, function (err, book) {
+            return res.json({ status: true });
+        });
+    }
 }
 
 module.exports = new BookController();
