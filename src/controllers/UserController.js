@@ -136,6 +136,19 @@ class UserController {
             res.json({ status: true });
         });
     }
+
+    getInfo(req, res) {
+        // console.log(req.params);
+        User.findOne({ _id: req.params.id }, (err, data) => {
+            let user = {
+                avatar: data.avatar,
+                account: data.account,
+                email: data.email,
+                phoneNumber: data.phoneNumber,
+            };
+            return res.json({ status: true, user });
+        });
+    }
 }
 
 module.exports = new UserController();
