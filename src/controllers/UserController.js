@@ -40,7 +40,7 @@ class UserController {
         const { account, password } = req.body;
         let checkAccount = await User.findOne({ account });
         if (checkAccount) {
-            let checkPassword = bcrypt.compare(password, checkAccount.password);
+            let checkPassword = await bcrypt.compare(password, checkAccount.password);
             if (checkPassword) {
                 let user = { userId: checkAccount._id, avatar: checkAccount.avatar, account: checkAccount.account };
                 return res.json({ status: true, user });
@@ -141,6 +141,7 @@ class UserController {
         // console.log(req.params);
         User.findOne({ _id: req.params.id }, (err, data) => {
             let user = {
+                userId: data._id,
                 avatar: data.avatar,
                 account: data.account,
                 email: data.email,
@@ -148,6 +149,26 @@ class UserController {
             };
             return res.json({ status: true, user });
         });
+    }
+
+    async editProfile(req, res) {
+        const { userId, phoneNumber, avatar, email, password, newPassword, oldPassword } = req.body.profile;
+        let user = await User.findOne({ _id: userId });
+        if (password) {
+            let checkPassword = await bcrypt.compare(oldPassword, user.password);
+            console.log(checkPassword);
+            if (checkPassword) {
+                let hash = await bcrypt.hash(newPassword, 10);
+                user.password = hash;
+            } else {
+                return res.json({ status: false, msg: 'Mật khẩu không đúng' });
+            }
+        }
+        user.avatar = avatar;
+        user.phoneNumber = phoneNumber;
+        user.email = email;
+        user.save();
+        return res.json({ status: true, msg: 'Đã cập nhật thông tin tài khoản' });
     }
 }
 
