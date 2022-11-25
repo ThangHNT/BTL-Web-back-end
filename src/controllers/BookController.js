@@ -21,7 +21,7 @@ class BookController {
     }
 
     getAllBook(req, res) {
-        Book.find({}, (err, books) => {
+        Book.find({ deleted: false }, (err, books) => {
             return res.json({ books });
         });
     }
@@ -60,7 +60,9 @@ class BookController {
 
     deleteBook(req, res) {
         // console.log(req.params);
-        Book.deleteOne({ _id: req.params.id }, function (err, book) {
+        Book.findOne({ _id: req.params.id }, function (err, book) {
+            book.deleted = true;
+            book.save();
             return res.json({ status: true });
         });
     }
@@ -69,7 +71,7 @@ class BookController {
         let results = [];
         let searchString = req.body.searchValue.toLowerCase();
         let searchStringArr = searchString.split(' ');
-        const books = await Book.find({});
+        const books = await Book.find({ deleted: false });
         books.forEach((book) => {
             let title = book.title.toLowerCase();
             let result = {
@@ -88,37 +90,6 @@ class BookController {
             }
         });
         return res.json({ status: true, results });
-    }
-
-    searchUser(req, res) {
-        let name = req.query.q;
-        const exceptionuser = req.query.exceptUser;
-        let listUser = [];
-        User.find({}, function (err, users) {
-            users.forEach((user) => {
-                const arr = name.split(' ');
-                const data = {
-                    username: user.username,
-                    avatar: user.avatar,
-                    userId: user._id,
-                };
-                if (arr.length == 1 && user.username.startsWith(name) && user._id != exceptionuser) {
-                    listUser.push(data);
-                } else {
-                    for (let i = 0; i < arr.length; i++) {
-                        if (user.username.indexOf(arr[i]) > -1 && user._id != exceptionuser) {
-                            listUser.push(data);
-                            break;
-                        }
-                    }
-                }
-            });
-            if (listUser.length > 0) {
-                return res.json({ status: true, listUser });
-            } else {
-                return res.json({ status: false, msg: 'ko co nguoi dung trong he thong' });
-            }
-        });
     }
 }
 

@@ -41,8 +41,13 @@ class UserController {
         let checkAccount = await User.findOne({ account });
         if (checkAccount) {
             let checkPassword = await bcrypt.compare(password, checkAccount.password);
+            // console.log(checkPassword);
             if (checkPassword) {
-                let user = { userId: checkAccount._id, avatar: checkAccount.avatar, account: checkAccount.account };
+                let user;
+                user = { userId: checkAccount._id, avatar: checkAccount.avatar, account: checkAccount.account };
+                if (checkAccount.admin) {
+                    user.admin = true;
+                }
                 return res.json({ status: true, user });
             } else {
                 return res.json({ status: false, msg: 'Tài khoản hoặc mật khẩu không đúng' });
@@ -101,6 +106,7 @@ class UserController {
                 coverImage: book.coverImage,
                 price: book.price,
                 title: book.title,
+                deleted: book.deleted,
             };
             let ordering = await Order.find({ book: item, customer: userId });
             let purchaseHistory = [];
@@ -156,7 +162,6 @@ class UserController {
         let user = await User.findOne({ _id: userId });
         if (password) {
             let checkPassword = await bcrypt.compare(oldPassword, user.password);
-            console.log(checkPassword);
             if (checkPassword) {
                 let hash = await bcrypt.hash(newPassword, 10);
                 user.password = hash;

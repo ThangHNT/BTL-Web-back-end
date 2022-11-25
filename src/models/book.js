@@ -11,6 +11,7 @@ const Book = Schema({
     category: { type: String, required: true, maxLength: 20 },
     numberOfPage: { type: String, required: true },
     quantity: { type: Number, required: true, default: 1 },
+    deleted: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model('Book', Book);
