@@ -4,6 +4,7 @@ const Order = require('../models/order');
 const Book = require('../models/book');
 const Cart = require('../models/cart');
 const book = require('../models/book');
+const cart = require('../models/cart');
 
 class UserController {
     async register(req, res, next) {
@@ -137,10 +138,10 @@ class UserController {
     }
 
     async cancelOrder(req, res) {
-        // console.log(req.params);
-        Order.deleteOne({ _id: req.params.id }, (err, order) => {
-            res.json({ status: true });
-        });
+        // console.log(req.body);
+        const { orderId } = req.body;
+        await Order.deleteOne({ _id: orderId });
+        res.json({ status: true });
     }
 
     getInfo(req, res) {
